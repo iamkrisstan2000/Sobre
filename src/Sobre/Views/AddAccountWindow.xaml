@@ -1,0 +1,229 @@
+<UserControl x:Class="Sobre.Views.AddAccountWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Sobre.Controls"
+             xmlns:conv="clr-namespace:Sobre.Converters"
+             Visibility="{Binding IsAddAccountOpen, Converter={StaticResource BoolToVis}}">
+
+    <Grid Background="#66000000">
+        <Border Width="820" MaxHeight="640" VerticalAlignment="Center" HorizontalAlignment="Center"
+                Background="{DynamicResource FlyoutFill}" BorderBrush="{DynamicResource FlyoutStroke}"
+                BorderThickness="1" CornerRadius="8">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="44" ShadowDepth="12" Opacity="0.45" Color="Black" />
+            </Border.Effect>
+
+            <DockPanel>
+                <Grid DockPanel.Dock="Top" Margin="24,18,14,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Add an account" FontSize="22" FontWeight="SemiBold"
+                                   FontFamily="{StaticResource DisplayFont}" Foreground="{DynamicResource TextPrimary}" />
+                        <TextBlock Text="Pick a provider and Sobre fills in the servers for you."
+                                   FontSize="11.5" Margin="0,2,0,0" Foreground="{DynamicResource TextTertiary}" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Style="{StaticResource IconButtonStyle}" Click="OnClose">
+                        <controls:IconPresenter Icon="Dismiss" Size="15" />
+                    </Button>
+                </Grid>
+
+                <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource Divider}" />
+
+                <!-- footer -->
+                <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,0"
+                        Padding="24,12">
+                    <DockPanel>
+                        <TextBlock x:Name="ResultText" DockPanel.Dock="Left" VerticalAlignment="Center" FontSize="11.5"
+                                   MaxWidth="380" TextWrapping="Wrap" Foreground="{DynamicResource TextTertiary}" />
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button x:Name="TestButton" Style="{StaticResource StandardButtonStyle}" Content="Test connection"
+                                    Margin="0,0,8,0" Click="OnTest" />
+                            <Button x:Name="SaveButton" Style="{StaticResource AccentButtonStyle}" Content="Add account"
+                                    MinWidth="118" Click="OnSave" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="236" />
+                        <ColumnDefinition Width="1" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- provider list -->
+                    <Border Grid.Column="0" Background="{DynamicResource LayerFill}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10,10">
+                            <ItemsControl x:Name="ProviderList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource SubtleButtonStyle}" Padding="0" Margin="0,2"
+                                                HorizontalContentAlignment="Stretch" Click="OnProviderClick" Tag="{Binding}">
+                                            <Grid Height="48">
+                                                <Border x:Name="Sel" CornerRadius="4" Background="Transparent" />
+                                                <Grid Margin="10,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Width="28" Height="28" CornerRadius="14">
+                                                        <Border.Background>
+                                                            <SolidColorBrush Color="{Binding AccentHex, Converter={StaticResource AccountColor}}" />
+                                                        </Border.Background>
+                                                        <TextBlock Text="{Binding AvatarText}" Foreground="White"
+                                                                   FontSize="12" FontWeight="SemiBold"
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+                                                    <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource TextPrimary}" />
+                                                        <TextBlock Text="{Binding Description}" FontSize="11"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   Foreground="{DynamicResource TextTertiary}" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Grid>
+                                        </Button>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter TargetName="Sel" Property="Background" Value="{DynamicResource ControlFill}" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="{DynamicResource Divider}" />
+
+                    <!-- form -->
+                    <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" Padding="24,16,24,20">
+                        <StackPanel>
+                            <TextBlock x:Name="ProviderTitle" FontSize="16" FontWeight="SemiBold"
+                                       FontFamily="{StaticResource DisplayFont}"
+                                       Foreground="{DynamicResource TextPrimary}" />
+
+                            <!-- guidance -->
+                            <Border x:Name="GuidanceBox" Background="{DynamicResource AccentSubtleFill}" CornerRadius="6"
+                                    Padding="12,10" Margin="0,10,0,16" Visibility="Collapsed">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:IconPresenter Icon="Info" Size="15" Foreground="{DynamicResource AccentText}" />
+                                        <TextBlock Text="Before you sign in" Margin="8,0,0,0" FontSize="12" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource AccentText}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock x:Name="GuidanceText" FontSize="11.5" Margin="23,4,0,0"
+                                               TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}" />
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="Your details" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,8" />
+
+                            <TextBlock Text="Display name" FontSize="12" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,4" />
+                            <TextBox x:Name="DisplayNameBox" Style="{StaticResource FluentTextBox}" Margin="0,0,0,12"
+                                     Tag="e.g. Personal" TextChanged="OnFieldChanged" />
+
+                            <TextBlock Text="Email address" FontSize="12" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,4" />
+                            <TextBox x:Name="EmailBox" Style="{StaticResource FluentTextBox}" Margin="0,0,0,12"
+                                     Tag="you@example.com" TextChanged="OnEmailChanged" />
+
+                            <TextBlock Text="Password or app password" FontSize="12" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,4" />
+                            <PasswordBox x:Name="PasswordBox" Style="{StaticResource FluentPasswordBox}" Margin="0,0,0,4" />
+                            <TextBlock Text="Sealed with Windows DPAPI — only your Windows account can decrypt it."
+                                       FontSize="11" Foreground="{DynamicResource TextTertiary}" Margin="0,0,0,14" TextWrapping="Wrap" />
+
+                            <Border Height="1" Background="{DynamicResource Divider}" Margin="0,0,0,14" />
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="Server settings" FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimary}" />
+                                <Button Style="{StaticResource SubtleButtonStyle}" Padding="8,1" Margin="10,0,0,0"
+                                        Click="OnToggleAdvanced">
+                                    <TextBlock x:Name="AdvancedLabel" Text="Show" FontSize="11.5"
+                                               Foreground="{DynamicResource AccentText}" />
+                                </Button>
+                            </StackPanel>
+
+                            <StackPanel x:Name="AdvancedPanel" Visibility="Collapsed">
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="IMAP server" FontSize="12" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,4" />
+                                        <TextBox x:Name="ImapHostBox" Style="{StaticResource FluentTextBox}" Tag="imap.example.com" />
+                                    </StackPanel>
+                                    <TextBox Grid.Column="2" x:Name="ImapPortBox" Style="{StaticResource FluentTextBox}"
+                                             Width="80" Tag="993" VerticalAlignment="Bottom" />
+                                    <ComboBox Grid.Column="4" x:Name="ImapSecurityBox" Style="{StaticResource FluentComboBox}"
+                                              Width="132" VerticalAlignment="Bottom">
+                                        <ComboBoxItem Content="SSL / TLS" Tag="SslOnConnect" IsSelected="True" />
+                                        <ComboBoxItem Content="STARTTLS" Tag="StartTls" />
+                                        <ComboBoxItem Content="STARTTLS (auto)" Tag="StartTlsWhenAvailable" />
+                                        <ComboBoxItem Content="None" Tag="None" />
+                                    </ComboBox>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="SMTP server" FontSize="12" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,4" />
+                                        <TextBox x:Name="SmtpHostBox" Style="{StaticResource FluentTextBox}" Tag="smtp.example.com" />
+                                    </StackPanel>
+                                    <TextBox Grid.Column="2" x:Name="SmtpPortBox" Style="{StaticResource FluentTextBox}"
+                                             Width="80" Tag="587" VerticalAlignment="Bottom" />
+                                    <ComboBox Grid.Column="4" x:Name="SmtpSecurityBox" Style="{StaticResource FluentComboBox}"
+                                              Width="132" VerticalAlignment="Bottom">
+                                        <ComboBoxItem Content="SSL / TLS" Tag="SslOnConnect" />
+                                        <ComboBoxItem Content="STARTTLS" Tag="StartTls" IsSelected="True" />
+                                        <ComboBoxItem Content="STARTTLS (auto)" Tag="StartTlsWhenAvailable" />
+                                        <ComboBoxItem Content="None" Tag="None" />
+                                    </ComboBox>
+                                </Grid>
+
+                                <TextBlock Text="Username (leave blank to use the email address)" FontSize="12"
+                                           Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,4" />
+                                <TextBox x:Name="UserNameBox" Style="{StaticResource FluentTextBox}" Margin="0,0,0,12"
+                                         Tag="you@example.com" />
+
+                                <CheckBox x:Name="SmtpAuthBox" Style="{StaticResource FluentCheckBox}"
+                                          Content="SMTP server requires authentication" IsChecked="True" Margin="0,0,0,12" />
+
+                                <TextBlock Text="Signature (added to new mail and replies)" FontSize="12"
+                                           Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,4" />
+                                <TextBox x:Name="SignatureBox" Style="{StaticResource FluentTextBox}" Height="70"
+                                         AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top"
+                                         Tag="— Sent from Sobre" />
+                            </StackPanel>
+
+                            <Border Background="{DynamicResource CardFill}" CornerRadius="6" Padding="12,10" Margin="0,16,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:IconPresenter Icon="Shield" Size="15" Foreground="{DynamicResource SuccessFill}"
+                                                            VerticalAlignment="Top" />
+                                    <TextBlock Margin="10,0,0,0" FontSize="11.5" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               Text="Sobre connects only to the servers listed above, over the encryption you choose. Nothing is sent to us — there is no 'us' to send it to." />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

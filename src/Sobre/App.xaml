@@ -1,0 +1,40 @@
+<Application x:Class="Sobre.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Sobre.Controls"
+             xmlns:conv="clr-namespace:Sobre.Converters"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Controls.xaml" />
+                <ResourceDictionary Source="Themes/Icons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Value converters: app-scoped so every window and template can reach them -->
+            <conv:BoolToVisibilityConverter x:Key="BoolToVis" />
+            <conv:BoolToVisibilityConverter x:Key="InvBoolToVis" Invert="True" />
+            <conv:NullToVisibilityConverter x:Key="NullToVis" />
+            <conv:NullToVisibilityConverter x:Key="NullToVisInverse" Invert="True" />
+            <conv:CountToVisibilityConverter x:Key="CountToVis" />
+            <conv:UnreadBadgeConverter x:Key="UnreadBadge" />
+            <conv:UnreadWeightConverter x:Key="UnreadWeight" />
+            <conv:UnreadBrushConverter x:Key="UnreadBrush" />
+            <conv:FolderKindToIconConverter x:Key="FolderIcon" />
+            <conv:AccountColorToBrushConverter x:Key="AccountColor" />
+            <conv:StringToVisibilityConverter x:Key="StringToVis" />
+            <conv:EqualsRefConverter x:Key="EqualsRef" />
+
+            <!-- Icon presenter: Fluent glyph, tinted and scaled -->
+            <Style TargetType="controls:IconPresenter">
+                <Setter Property="Size" Value="20" />
+                <Setter Property="Filled" Value="False" />
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+
+            <Style TargetType="TextBlock" BasedOn="{StaticResource BaseText}" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

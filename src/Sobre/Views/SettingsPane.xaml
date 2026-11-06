@@ -1,0 +1,313 @@
+<UserControl x:Class="Sobre.Views.SettingsPane"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Sobre.Controls"
+             Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVis}}">
+
+    <Grid Background="#66000000">
+        <Border Width="820" MaxHeight="680" VerticalAlignment="Center" HorizontalAlignment="Center"
+                Background="{DynamicResource FlyoutFill}" BorderBrush="{DynamicResource FlyoutStroke}"
+                BorderThickness="1" CornerRadius="8">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="44" ShadowDepth="12" Opacity="0.45" Color="Black" />
+            </Border.Effect>
+
+            <DockPanel>
+                <!-- header -->
+                <Grid DockPanel.Dock="Top" Margin="24,18,14,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Settings" FontSize="22" FontWeight="SemiBold"
+                                   FontFamily="{StaticResource DisplayFont}" Foreground="{DynamicResource TextPrimary}" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Style="{StaticResource IconButtonStyle}"
+                            Command="{Binding CloseSettingsCommand}" ToolTip="Close (Esc)">
+                        <controls:IconPresenter Icon="Dismiss" Size="15" />
+                    </Button>
+                </Grid>
+
+                <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource Divider}" />
+
+                <!-- footer -->
+                <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,0"
+                        Padding="24,12">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" FontSize="11.5"
+                                   Foreground="{DynamicResource TextTertiary}"
+                                   Text="Credentials sealed with Windows DPAPI · %LOCALAPPDATA%\Sobre" />
+                        <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Style="{StaticResource AccentButtonStyle}"
+                                Content="Done" MinWidth="96" Command="{Binding CloseSettingsCommand}" />
+                    </DockPanel>
+                </Border>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,16,24,16">
+                    <StackPanel>
+
+                        <!-- ============ Appearance ============ -->
+                        <TextBlock Text="Appearance" Style="{StaticResource BodyStrongTextStyle}" FontSize="15" />
+                        <Border Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource CardStroke}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,10,0,22">
+                            <StackPanel>
+                                <TextBlock Text="Theme" FontSize="13" FontWeight="SemiBold" />
+                                <TextBlock Text="Follows Windows by default, and updates the moment you change the system theme."
+                                           FontSize="11.5" Foreground="{DynamicResource TextTertiary}" Margin="0,2,0,12"
+                                           TextWrapping="Wrap" />
+
+                                <!-- Theme picker: three large, obvious cards -->
+                                <UniformGrid Columns="3">
+                                    <RadioButton Style="{StaticResource ThemeCardRadio}" GroupName="Theme" Tag="System"
+                                                 IsChecked="{Binding IsSystemTheme, Mode=OneWay}"
+                                                 Command="{Binding SetThemeCommand}" CommandParameter="System"
+                                                 Margin="0,0,6,0">
+                                        <StackPanel>
+                                            <controls:IconPresenter Icon="Desktop" Size="20" HorizontalAlignment="Center" />
+                                            <TextBlock Text="Use system" FontSize="12.5" FontWeight="SemiBold"
+                                                       HorizontalAlignment="Center" Margin="0,7,0,0" />
+                                            <TextBlock Text="Match Windows" FontSize="11" HorizontalAlignment="Center"
+                                                       Foreground="{DynamicResource TextTertiary}" Margin="0,1,0,0" />
+                                        </StackPanel>
+                                    </RadioButton>
+                                    <RadioButton Style="{StaticResource ThemeCardRadio}" GroupName="Theme" Tag="Light"
+                                                 IsChecked="{Binding IsLightTheme, Mode=OneWay}"
+                                                 Command="{Binding SetThemeCommand}" CommandParameter="Light"
+                                                 Margin="0,0,6,0">
+                                        <StackPanel>
+                                            <controls:IconPresenter Icon="WeatherSunny" Size="20" HorizontalAlignment="Center" />
+                                            <TextBlock Text="Light" FontSize="12.5" FontWeight="SemiBold"
+                                                       HorizontalAlignment="Center" Margin="0,7,0,0" />
+                                            <TextBlock Text="Bright surfaces" FontSize="11" HorizontalAlignment="Center"
+                                                       Foreground="{DynamicResource TextTertiary}" Margin="0,1,0,0" />
+                                        </StackPanel>
+                                    </RadioButton>
+                                    <RadioButton Style="{StaticResource ThemeCardRadio}" GroupName="Theme" Tag="Dark"
+                                                 IsChecked="{Binding IsDarkTheme, Mode=OneWay}"
+                                                 Command="{Binding SetThemeCommand}" CommandParameter="Dark">
+                                        <StackPanel>
+                                            <controls:IconPresenter Icon="DarkTheme" Size="20" HorizontalAlignment="Center" />
+                                            <TextBlock Text="Dark" FontSize="12.5" FontWeight="SemiBold"
+                                                       HorizontalAlignment="Center" Margin="0,7,0,0" />
+                                            <TextBlock Text="Low light" FontSize="11" HorizontalAlignment="Center"
+                                                       Foreground="{DynamicResource TextTertiary}" Margin="0,1,0,0" />
+                                        </StackPanel>
+                                    </RadioButton>
+                                </UniformGrid>
+
+                                <TextBlock Text="{Binding ThemeModeLabel, StringFormat='Currently: {0}'}" FontSize="11.5"
+                                           Foreground="{DynamicResource TextTertiary}" Margin="0,12,0,0" />
+
+                                <Border Height="1" Margin="0,16" Background="{DynamicResource Divider}" />
+
+                                <CheckBox Style="{StaticResource FluentToggleSwitch}" IsChecked="{Binding Settings.UseAcrylic}"
+                                          Content="Translucency Effects"
+                                          Checked="OnAppearanceChanged" Unchecked="OnAppearanceChanged" />
+                                <TextBlock Text="Windows 11 22H2 and later render the real Mica material; earlier builds use a solid Fluent layer."
+                                           FontSize="11.5" Foreground="{DynamicResource TextTertiary}" Margin="52,4,0,0"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ============ App lock ============ -->
+                        <TextBlock Text="App lock" Style="{StaticResource BodyStrongTextStyle}" FontSize="15" />
+                        <Border Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource CardStroke}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,10,0,22">
+                            <StackPanel>
+                                <CheckBox x:Name="LockToggle" Style="{StaticResource FluentToggleSwitch}"
+                                          Content="Ask for a password when Sobre opens"
+                                          Checked="OnLockToggleChanged" Unchecked="OnLockToggleChanged" />
+                                <TextBlock Text="The password is never stored — only a PBKDF2-SHA256 hash with a random salt, so it can't be recovered from the settings file."
+                                           FontSize="11.5" Foreground="{DynamicResource TextTertiary}" Margin="52,4,0,12"
+                                           TextWrapping="Wrap" />
+
+                                <!-- setup / change form -->
+                                <TextBlock x:Name="LockOnHint"
+                                           Text="Sobre asks for this password every time it opens. Use Change password below, or Lock now to lock it on the spot."
+                                           FontSize="11.5" Foreground="{DynamicResource TextTertiary}"
+                                           Margin="52,2,0,10" TextWrapping="Wrap" Visibility="Collapsed" />
+
+                                <StackPanel x:Name="LockForm" Visibility="Collapsed" Margin="0,4,0,0">
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="12" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="New password" FontSize="12"
+                                                       Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,4" />
+                                            <PasswordBox x:Name="NewPasswordBox" Style="{StaticResource FluentPasswordBox}"
+                                                         PasswordChanged="OnNewPasswordChanged" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Confirm password" FontSize="12"
+                                                       Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,4" />
+                                            <PasswordBox x:Name="ConfirmPasswordBox" Style="{StaticResource FluentPasswordBox}" />
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <TextBlock x:Name="StrengthText" Text="" FontSize="11"
+                                               Foreground="{DynamicResource TextTertiary}" Margin="0,0,0,8" />
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button x:Name="SaveLockButton" Style="{StaticResource AccentButtonStyle}"
+                                                Content="Set password" MinWidth="120" Click="OnSaveLock" />
+                                        <Button x:Name="RemoveLockButton" Style="{StaticResource StandardButtonStyle}"
+                                                Content="Remove password" Margin="8,0,0,0" Click="OnRemoveLock"
+                                                Visibility="Collapsed" />
+                                        <Button Style="{StaticResource SubtleButtonStyle}" Content="Lock now"
+                                                Margin="8,0,0,0" Click="OnLockNow" />
+                                    </StackPanel>
+
+                                    <TextBlock x:Name="LockError" Text="" FontSize="11.5" Margin="0,8,0,0"
+                                               Foreground="{DynamicResource ErrorFill}" TextWrapping="Wrap"
+                                               Visibility="Collapsed" />
+                                </StackPanel>
+
+                                <Button x:Name="ChangeLockButton" Style="{StaticResource SubtleButtonStyle}"
+                                        HorizontalAlignment="Left" Padding="0,4" Click="OnShowLockForm"
+                                        Visibility="Collapsed">
+                                    <TextBlock Text="Change password" FontSize="12"
+                                               Foreground="{DynamicResource AccentText}" />
+                                </Button>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ============ Accounts ============ -->
+                        <TextBlock Text="Accounts" Style="{StaticResource BodyStrongTextStyle}" FontSize="15" />
+                        <Border Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource CardStroke}"
+                                BorderThickness="1" CornerRadius="8" Padding="8,10" Margin="0,10,0,22">
+                            <StackPanel>
+                                <ItemsControl ItemsSource="{Binding Accounts}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="8,6">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border Width="34" Height="34" CornerRadius="17">
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="{Binding AccentHex, Converter={StaticResource AccountColor}}" />
+                                                    </Border.Background>
+                                                    <TextBlock Text="{Binding Initial}" Foreground="White" FontWeight="SemiBold"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="13" />
+                                                    <TextBlock Text="{Binding Email}" FontSize="11.5"
+                                                               Foreground="{DynamicResource TextTertiary}" />
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="2" Text="{Binding Provider}" FontSize="11.5"
+                                                           VerticalAlignment="Center" Margin="0,0,12,0"
+                                                           Foreground="{DynamicResource TextTertiary}" />
+                                                <Button Grid.Column="3" Style="{StaticResource IconButtonStyle}"
+                                                        Command="{Binding DataContext.RemoveAccountCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}" ToolTip="Remove account">
+                                                    <controls:IconPresenter Icon="Delete" Size="15" />
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <Button Style="{StaticResource StandardButtonStyle}" Margin="8,8,8,2"
+                                        HorizontalAlignment="Left" Command="{Binding AddAccountCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:IconPresenter Icon="Add" Size="15" />
+                                        <TextBlock Text="Add account" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ============ Privacy ============ -->
+                        <TextBlock Text="Privacy &amp; security" Style="{StaticResource BodyStrongTextStyle}" FontSize="15" />
+                        <Border Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource CardStroke}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,10,0,22">
+                            <StackPanel>
+                                <CheckBox Style="{StaticResource FluentToggleSwitch}" IsChecked="{Binding Settings.BlockRemoteImages}"
+                                          Content="Always block remote images" />
+                                <TextBlock Text="Blocking remote images stops senders from tracking when and where you open a message."
+                                           FontSize="11.5" Foreground="{DynamicResource TextTertiary}" Margin="52,4,0,12"
+                                           TextWrapping="Wrap" />
+                                <CheckBox Style="{StaticResource FluentToggleSwitch}" IsChecked="{Binding Settings.ConfirmOnDelete}"
+                                          Content="Ask before deleting a message" />
+                                <Border Height="1" Margin="0,14" Background="{DynamicResource Divider}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:IconPresenter Icon="Shield" Size="16" Foreground="{DynamicResource SuccessFill}" />
+                                    <TextBlock Margin="10,0,0,0" FontSize="12" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               Text="No ads, no tracking, no telemetry — Sobre only connects to your mail servers. Your passwords stay encrypted on this device." />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ============ Reading & sync ============ -->
+                        <TextBlock Text="Reading &amp; sync" Style="{StaticResource BodyStrongTextStyle}" FontSize="15" />
+                        <Border Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource CardStroke}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,10,0,22">
+                            <StackPanel>
+                                <CheckBox Style="{StaticResource FluentToggleSwitch}" IsChecked="{Binding Settings.ShowPreviewText}"
+                                          Content="Show a preview line in the message list" Margin="0,0,0,16" />
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Check for new mail" FontSize="13" FontWeight="SemiBold" />
+                                        <TextBlock Text="How often Sobre polls your IMAP account while it's open."
+                                                   FontSize="11.5" Foreground="{DynamicResource TextTertiary}" />
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1" Width="150" Style="{StaticResource FluentComboBox}"
+                                              SelectedIndex="{Binding SyncIntervalIndex, Mode=TwoWay}">
+                                        <ComboBoxItem Content="Every minute" />
+                                        <ComboBoxItem Content="Every 5 minutes" />
+                                        <ComboBoxItem Content="Every 15 minutes" />
+                                        <ComboBoxItem Content="Every 30 minutes" />
+                                    </ComboBox>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ============ About ============ -->
+                        <TextBlock Text="About" Style="{StaticResource BodyStrongTextStyle}" FontSize="15" />
+                        <Border Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource CardStroke}"
+                                BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,10,0,6">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button Click="OnAboutIconClicked" ToolTip="Open GitHub — github.com/iamkrisstan2000/Sobre"
+                                        Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand"
+                                        VerticalAlignment="Top">
+                                    <Image Source="pack://application:,,,/Assets/sobre_256.png" Width="56" Height="56"
+                                           RenderOptions.BitmapScalingMode="HighQuality" />
+                                </Button>
+                                <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                                    <TextBlock Text="Sobre" FontSize="16" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource DisplayFont}" />
+                                    <TextBlock Text="Version 1.0.0 · Windows 11 · x64" FontSize="11.5"
+                                               Foreground="{DynamicResource TextTertiary}" Margin="0,2,0,0" />
+                                    <TextBlock Margin="0,8,0,0" FontSize="11.5" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               Text="Sobre is a multi-client mail program: configure any IMAP + SMTP server, or start from the built-in Gmail, Outlook, Yahoo, iCloud or Fastmail presets. Icons are Microsoft's Fluent System Icons (MIT)." />
+                                    <Border Height="1" Background="{DynamicResource Divider}" Margin="0,12,0,12" />
+                                    <TextBlock Text="Created by Mr Knight (KnightWin)" FontSize="11.5" Foreground="{DynamicResource TextSecondary}" />
+                                    <TextBlock Text="Made possible with AI" FontSize="11.5" Foreground="{DynamicResource TextTertiary}" Margin="0,2,0,0" />
+                                    <TextBlock Text="November 2026" FontSize="11.5" Foreground="{DynamicResource TextTertiary}" Margin="0,2,0,0" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

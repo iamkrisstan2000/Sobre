@@ -1,0 +1,143 @@
+<UserControl x:Class="Sobre.Views.ComposeWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Sobre.Controls"
+             xmlns:conv="clr-namespace:Sobre.Converters"
+             Visibility="{Binding IsComposeOpen, Converter={StaticResource BoolToVis}}">
+
+    <Grid Background="#66000000">
+        <Border Width="760" MaxHeight="620" VerticalAlignment="Center" HorizontalAlignment="Center"
+                Background="{DynamicResource FlyoutFill}" BorderBrush="{DynamicResource FlyoutStroke}"
+                BorderThickness="1" CornerRadius="8">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="40" ShadowDepth="10" Opacity="0.42" Color="Black" />
+            </Border.Effect>
+
+            <DockPanel>
+                <!-- header -->
+                <Grid DockPanel.Dock="Top" Margin="20,16,12,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="New message" FontSize="18" FontWeight="SemiBold"
+                                   FontFamily="{StaticResource DisplayFont}"
+                                   Foreground="{DynamicResource TextPrimary}" />
+                        <TextBlock Text="{Binding ComposeFrom, StringFormat='From {0}'}" FontSize="11.5"
+                                   Foreground="{DynamicResource TextTertiary}" Margin="0,2,0,0" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Style="{StaticResource IconButtonStyle}" Command="{Binding CloseComposeCommand}"
+                            ToolTip="Close (Esc)">
+                        <controls:IconPresenter Icon="Dismiss" Size="15" />
+                    </Button>
+                </Grid>
+
+                <Border DockPanel.Dock="Top" Height="1" Margin="20,0,20,0" Background="{DynamicResource Divider}" />
+
+                <!-- fields -->
+                <StackPanel DockPanel.Dock="Top" Margin="20,14,20,0">
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="To" Width="44" VerticalAlignment="Center" FontSize="13"
+                                   Foreground="{DynamicResource TextSecondary}" />
+                        <TextBox Grid.Column="1" Style="{StaticResource FluentTextBox}"
+                                 Text="{Binding ComposeToText, UpdateSourceTrigger=PropertyChanged}"
+                                 Tag="name@example.com" />
+                        <Button Grid.Column="2" Style="{StaticResource SubtleButtonStyle}" Margin="8,0,0,0"
+                                Command="{Binding ToggleComposeCcCommand}" ToolTip="Show Cc / Bcc">
+                            <controls:IconPresenter Icon="People" Size="15" Foreground="{DynamicResource AccentText}" />
+                        </Button>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10" Visibility="{Binding ShowComposeCc, Converter={StaticResource BoolToVis}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Cc" Width="44" VerticalAlignment="Center" FontSize="13"
+                                   Foreground="{DynamicResource TextSecondary}" />
+                        <TextBox Grid.Column="1" Style="{StaticResource FluentTextBox}"
+                                 Text="{Binding ComposeCcText, UpdateSourceTrigger=PropertyChanged}"
+                                 Tag="Separate multiple addresses with a comma" />
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Subject" Width="44" VerticalAlignment="Center" FontSize="13"
+                                   Foreground="{DynamicResource TextSecondary}" />
+                        <TextBox Grid.Column="1" Style="{StaticResource FluentTextBox}"
+                                 Text="{Binding ComposeSubject, UpdateSourceTrigger=PropertyChanged}"
+                                 FontWeight="SemiBold" Tag="Subject" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- footer -->
+                <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource Divider}" BorderThickness="0,1,0,0"
+                        Padding="20,12">
+                    <DockPanel>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <Button Style="{StaticResource SubtleButtonStyle}" Command="{Binding AttachCommand}"
+                                    ToolTip="Attach a file">
+                                <controls:IconPresenter Icon="Attach" Size="16" Filled="True"
+                                                        Foreground="{DynamicResource AccentText}" />
+                            </Button>
+                            <Button Style="{StaticResource SubtleButtonStyle}" ToolTip="Insert signature">
+                                <controls:IconPresenter Icon="Signature" Size="16" Filled="True"
+                                                        Foreground="{DynamicResource AccentText}" />
+                            </Button>
+                            <ItemsControl ItemsSource="{Binding ComposeAttachments}" VerticalAlignment="Center">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource CardFill}" CornerRadius="4"
+                                                Padding="8,3" Margin="4,0,0,0" BorderBrush="{DynamicResource CardStroke}"
+                                                BorderThickness="1">
+                                            <TextBlock Text="{Binding}" FontSize="11"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       TextTrimming="CharacterEllipsis" MaxWidth="160" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                            <Button Style="{StaticResource StandardButtonStyle}" Content="Discard" Margin="0,0,8,0"
+                                    Command="{Binding CloseComposeCommand}" />
+                            <Button Style="{StaticResource AccentButtonStyle}" Command="{Binding SendCommand}"
+                                    MinWidth="104">
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:IconPresenter Icon="Send" Size="15" Filled="True"
+                                                            Foreground="{DynamicResource OnAccentText}" />
+                                    <TextBlock Text="Send" Margin="8,0,0,0" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource OnAccentText}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <!-- body -->
+                <TextBox Style="{StaticResource FluentTextBox}"
+                         Text="{Binding ComposeBody, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="20,4,20,12" Padding="12,10"
+                         AcceptsReturn="True" TextWrapping="Wrap"
+                         VerticalContentAlignment="Top"
+                         VerticalScrollBarVisibility="Auto"
+                         Background="{DynamicResource ControlFill}"
+                         BorderThickness="1" FontSize="14" Tag="Write your message…"
+                         MinHeight="260" />
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

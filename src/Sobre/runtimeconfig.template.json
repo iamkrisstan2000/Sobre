@@ -1,0 +1,9 @@
+{
+  "configProperties": {
+    "System.GC.Server": false,
+    "System.GC.Concurrent": true,
+    "System.GC.RetainVM": false,
+    "System.Globalization.Invariant": false,
+    "System.Threading.ThreadPool.MinThreads": 4
+  }
+}
