@@ -4,6 +4,14 @@
 [![Windows](https://img.shields.io/badge/Windows-11-0078D4?logo=windows)](https://github.com/iamkrisstan2000/Sobre)
 [![Version](https://img.shields.io/badge/version-1.1.0-0F6CBD)](https://github.com/iamkrisstan2000/Sobre/releases)
 
+
+## Screenshots 
+
+<img width="1919" height="1079" alt="Screenshot 2026-11-06 112548" src="https://github.com/user-attachments/assets/aaf7459d-9f16-4bd3-bcf5-379ed455934a" />
+<img width="1919" height="1079" alt="Screenshot 2026-11-06 112525" src="https://github.com/user-attachments/assets/ec4019fa-c6b9-4544-97cd-ff8117684915" />
+<img width="1919" height="1079" alt="Screenshot 2026-11-06 112501" src="https://github.com/user-attachments/assets/64b2fa2f-c640-4338-a53f-f980df304eb6" />
+
+
 > **A fast, native Windows mail app.** No ads. No tracking. No Electron.
 
 **Created by Mr Knight (KnightWin) — Made possible with AI — November 2026**
