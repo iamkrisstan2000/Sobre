@@ -9,7 +9,6 @@ namespace Sobre.Models
 {
     public enum FolderKind { Inbox, Starred, Drafts, Sent, Archive, Spam, Trash, All }
     public enum MailSecurity { Auto, SslOnConnect, StartTls, StartTlsWhenAvailable, None }
-    public enum AuthKind { Password, OAuth }
 
     public sealed class MailFolder : INotifyPropertyChanged
     {
@@ -120,7 +119,6 @@ namespace Sobre.Models
         public string SmtpHost { get; set; } = "";
         public int SmtpPort { get; set; } = 587;
         public MailSecurity SmtpSecurity { get; set; } = MailSecurity.StartTls;
-        public bool IsOAuth { get; set; }
         public string? Note { get; set; }
         public string? HelpUrl { get; set; }
         public string AccentHex { get; set; } = "#0078D4";
@@ -139,16 +137,6 @@ namespace Sobre.Models
                 Domains = new[] { "gmail.com", "googlemail.com" },
                 Note = "Gmail requires a 16-character App Password when 2-Step Verification is on. Sign in to your Google Account \u203a Security \u203a App passwords and generate one for \u201cMail\u201d.",
                 HelpUrl = "https://myaccount.google.com/apppasswords"
-            },
-            new()
-            {
-                Id = "outlook", Name = "Outlook", Description = "Outlook.com, Hotmail & Microsoft 365",
-                ImapHost = "outlook.office365.com", ImapPort = 993, ImapSecurity = MailSecurity.SslOnConnect,
-                SmtpHost = "smtp.office365.com", SmtpPort = 587, SmtpSecurity = MailSecurity.StartTls,
-                AccentHex = "#0078D4", AvatarText = "O", Glyph = "Mail",
-                Domains = new[] { "outlook.com", "hotmail.com", "live.com", "msn.com" },
-                Note = "Microsoft 365 work accounts may require an app password, or your admin must allow IMAP/SMTP. Multi-factor sign-in via IMAP is limited \u2014 use an app password if prompted.",
-                HelpUrl = "https://support.microsoft.com/office/pop-imap-and-smtp-settings"
             },
             new()
             {

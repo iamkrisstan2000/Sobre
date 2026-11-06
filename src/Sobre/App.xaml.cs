@@ -1,7 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Sobre.Models;
@@ -20,37 +22,55 @@ namespace Sobre
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Always log startup — even if the UI crashes, sobre.log survives.
+            try { Log.Info($"Sobre starting {Assembly.GetExecutingAssembly().GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? ""} exe={Environment.ProcessPath} args={string.Join(" ", e.Args)}"); } catch { }
+
+            // Global handlers BEFORE anything that can throw
+            DispatcherUnhandledException += OnDispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
+            TaskScheduler.UnobservedTaskException += (s, ev) => { try { Log.Error("UnobservedTaskException", ev.Exception); } catch { } ev.SetObserved(); };
+
             // Installer mode — if the exe name contains "setup" or "installer", offer to install.
-            if (IsInstallerMode(e.Args))
+            try
             {
-                if (RunInstaller()) { Shutdown(); return; }
-                // If user cancels, fall through to normal launch.
+                if (IsInstallerMode(e.Args))
+                {
+                    if (RunInstaller()) { Shutdown(); return; }
+                    // If user cancels, fall through to normal launch.
+                }
             }
+            catch (Exception ex) { try { Log.Error("IsInstallerMode", ex); } catch { } }
 
             // Single instance — a second copy would fight over the same credential cache.
-            _singleInstance = new Mutex(true, @"Local\Sobre.Mail.SingleInstance", out bool createdNew);
-            if (!createdNew)
+            try
             {
-                MessageBox.Show(
-                    "Sobre is already running. Look for it on the taskbar.",
-                    "Sobre", MessageBoxButton.OK, MessageBoxImage.Information);
-                Shutdown();
-                return;
+                _singleInstance = new Mutex(true, @"Local\Sobre.Mail.SingleInstance", out bool createdNew);
+                if (!createdNew)
+                {
+                    MessageBox.Show(
+                        "Sobre is already running. Look for it on the taskbar.",
+                        "Sobre", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Shutdown();
+                    return;
+                }
             }
+            catch (Exception ex) { try { Log.Error("SingleInstance", ex); } catch { } }
 
             base.OnStartup(e);
 
-            DispatcherUnhandledException += OnDispatcherUnhandledException;
-            AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
+            // Keep app alive explicitly until window is closed — prevents OnMainWindowClose race after an early exception
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             try
             {
-                // Tokens must exist before the shell is built.
                 ThemeService.Current.Start();
+                try { Log.Info("ThemeService started, IsDark=" + ThemeService.Current.IsDark); } catch { }
 
                 var window = new MainWindow { DataContext = Shell };
                 MainWindow = window;
+                window.Closed += (_, _) => Shutdown();
                 window.Show();
+                try { Log.Info("MainWindow shown"); } catch { }
             }
             catch (Exception ex)
             {
@@ -66,6 +86,7 @@ namespace Sobre
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             LogCrash(e.Exception);
+            try { Log.Error("DispatcherUnhandled: " + Describe(e.Exception), e.Exception); } catch { }
             MessageBox.Show(
                 "Sobre hit an unexpected problem and kept running.\n\n" +
                 Describe(e.Exception) + "\n\nA log was written to:\n" + LogPath,
@@ -85,12 +106,19 @@ namespace Sobre
                     text += "\n→ " + inner.GetType().Name + ": " + inner.Message;
                 inner = inner.InnerException;
             }
+            if (ex.StackTrace != null) text += "\n\n" + ex.StackTrace;
             return text;
         }
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            if (e.ExceptionObject is Exception ex) LogCrash(ex);
+            try
+            {
+                if (e.ExceptionObject is Exception ex) LogCrash(ex);
+                else Log.Info("DomainUnhandled: " + e.ExceptionObject?.ToString());
+            }
+            catch { }
+            // Don't shutdown — let the dispatcher handler decide
         }
 
         private static string LogPath => Path.Combine(Store.DataDirectory, "sobre.log");
@@ -99,9 +127,10 @@ namespace Sobre
 
         protected override void OnExit(ExitEventArgs e)
         {
-            try { _vm?.PersistAccounts(); } catch { }
-            ThemeService.Current.Dispose();
-            _singleInstance?.Dispose();
+            try { Log.Info($"Sobre exiting code={e.ApplicationExitCode}"); } catch { }
+            try { _vm?.PersistAccounts(); } catch (Exception ex) { try { Log.Error("PersistAccounts on exit", ex); } catch { } }
+            try { ThemeService.Current.Dispose(); } catch { }
+            try { _singleInstance?.Dispose(); } catch { }
             base.OnExit(e);
         }
 
@@ -148,14 +177,12 @@ namespace Sobre
                 Directory.CreateDirectory(targetDir);
                 var target = Path.Combine(targetDir, "Sobre.exe");
 
-                // Don't overwrite a running copy — copy to temp then move.
                 var isSelf = string.Equals(Path.GetFullPath(source).TrimEnd('\\'), Path.GetFullPath(target).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase);
                 if (!isSelf)
                 {
                     File.Copy(source, target, true);
                 }
 
-                // Start Menu shortcut via WScript.Shell
                 try
                 {
                     var startMenu = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs");
@@ -174,7 +201,6 @@ namespace Sobre
                 }
                 catch { }
 
-                // Offer to launch
                 var launch = MessageBox.Show(
                     "Sobre was installed to:\n" + target + "\n\nLaunch it now?",
                     "Sobre", MessageBoxButton.YesNo, MessageBoxImage.Information);

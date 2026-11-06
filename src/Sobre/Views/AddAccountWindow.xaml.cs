@@ -78,6 +78,19 @@ namespace Sobre.Views
             {
                 GuidanceBox.Visibility = Visibility.Collapsed;
             }
+            // Show the official generator link when the preset has one (Gmail etc)
+            if (!string.IsNullOrWhiteSpace(vm.Preset.HelpUrl))
+            {
+                try { GuidanceHyperlink.NavigateUri = new Uri(vm.Preset.HelpUrl); } catch { }
+                GuidanceLinkText.Text = vm.Preset.Id == "gmail"
+                    ? "Open Google App Passwords →"
+                    : $"Open {vm.Preset.Name} help →";
+                GuidanceLink.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                GuidanceLink.Visibility = Visibility.Collapsed;
+            }
             if (!string.IsNullOrEmpty(vm.Preset.ImapHost)) ImapHostBox.Text = vm.Preset.ImapHost;
             if (!string.IsNullOrEmpty(vm.Preset.SmtpHost)) SmtpHostBox.Text = vm.Preset.SmtpHost;
             ImapPortBox.Text = vm.Preset.ImapPort.ToString();
@@ -147,7 +160,7 @@ namespace Sobre.Views
                 ? (email.Contains('@') ? email.Split('@')[0] : "Account")
                 : DisplayNameBox.Text.Trim();
 
-            return new AccountRecord
+            var account = new AccountRecord
             {
                 Id = Guid.NewGuid().ToString("N"),
                 DisplayName = name,
@@ -166,6 +179,7 @@ namespace Sobre.Views
                 AccentHex = preset.AccentHex,
                 AvatarText = string.IsNullOrEmpty(name) ? "?" : name.Substring(0, 1).ToUpperInvariant()
             };
+            return account;
         }
 
         private bool Validate(out string error)
@@ -255,6 +269,16 @@ namespace Sobre.Views
                 SaveButton.IsEnabled = true;
                 TestButton.IsEnabled = true;
             }
+        }
+
+        private void OnHelpNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+            }
+            catch { }
+            e.Handled = true;
         }
 
         private void OnClose(object sender, RoutedEventArgs e)

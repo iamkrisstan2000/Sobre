@@ -82,7 +82,7 @@ namespace Sobre.Services
             }
             catch (AuthenticationException ex)
             {
-                return MailResult.Fail("Sign-in was rejected. For Gmail and Outlook you usually need an app password, not your normal account password. " + ex.Message);
+                return MailResult.Fail("Sign-in was rejected. For Gmail you usually need an app password, not your normal account password. " + ex.Message);
             }
             catch (SslHandshakeException ex)
             {

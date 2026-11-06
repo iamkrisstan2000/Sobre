@@ -293,11 +293,11 @@
                                 <StackPanel Grid.Column="1" Margin="16,0,0,0">
                                     <TextBlock Text="Sobre" FontSize="16" FontWeight="SemiBold"
                                                FontFamily="{StaticResource DisplayFont}" />
-                                    <TextBlock Text="Version 1.0.0 · Windows 11 · x64" FontSize="11.5"
+                                    <TextBlock Text="Version 1.1.0 · Windows 11 · x64" FontSize="11.5"
                                                Foreground="{DynamicResource TextTertiary}" Margin="0,2,0,0" />
                                     <TextBlock Margin="0,8,0,0" FontSize="11.5" TextWrapping="Wrap"
                                                Foreground="{DynamicResource TextSecondary}"
-                                               Text="Sobre is a multi-client mail program: configure any IMAP + SMTP server, or start from the built-in Gmail, Outlook, Yahoo, iCloud or Fastmail presets. Icons are Microsoft's Fluent System Icons (MIT)." />
+                                               Text="Sobre is a multi-client mail program: configure any IMAP + SMTP server, or start from the built-in Gmail, Yahoo, iCloud or Fastmail presets. Icons are Microsoft's Fluent System Icons (MIT)." />
                                     <Border Height="1" Background="{DynamicResource Divider}" Margin="0,12,0,12" />
                                     <TextBlock Text="Created by Mr Knight (KnightWin)" FontSize="11.5" Foreground="{DynamicResource TextSecondary}" />
                                     <TextBlock Text="Made possible with AI" FontSize="11.5" Foreground="{DynamicResource TextTertiary}" Margin="0,2,0,0" />

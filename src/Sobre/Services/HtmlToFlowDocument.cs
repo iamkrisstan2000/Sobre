@@ -19,14 +19,15 @@ namespace Sobre.Services
         {
             var doc = new FlowDocument
             {
-                // Breathing room so body text never touches the pane edges. The scrollbar
-                // still sits at the very edge, because it is drawn by the viewer, not the page.
+                // PagePadding keeps text off the pane edges; PageWidth = NaN lets the
+                // document reflow to the viewer width (wrapped text) while still allowing
+                // a horizontal scrollbar for truly wide tables/code via the viewer.
                 PagePadding = new Thickness(20, 2, 20, 26),
                 FontFamily = new FontFamily("Segoe UI Variable Text, Segoe UI"),
                 FontSize = fontSize,
                 LineHeight = fontSize * 1.58,
                 TextAlignment = TextAlignment.Left,
-                PageWidth = 9000 // effectively unconstrained; the viewer wraps
+                PageWidth = double.NaN
             };
 
             var textBrush = new SolidColorBrush(dark ? Color.FromRgb(0xF2, 0xF2, 0xF2) : Color.FromRgb(0x1B, 0x1B, 0x1B));

@@ -283,14 +283,23 @@ namespace Sobre.ViewModels
         // =====================================================================
         public ShellViewModel()
         {
-            Settings = Store.LoadSettings();
-            ThemeService.Current.Start();
-            ApplyThemeFromSettings();
+            try { Log.Info("ShellViewModel ctor starting"); } catch { }
+            try { Settings = Store.LoadSettings(); } catch (Exception ex) { try { Log.Error("LoadSettings", ex); } catch { } Settings = new AppSettings(); }
+            try { ThemeService.Current.Start(); } catch (Exception ex) { try { Log.Error("ThemeService.Start in VM", ex); } catch { } }
+            try { ApplyThemeFromSettings(); } catch (Exception ex) { try { Log.Error("ApplyThemeFromSettings", ex); } catch { } }
 
-            foreach (var a in Store.LoadAccounts()) Accounts.Add(a);
+            try
+            {
+                foreach (var a in Store.LoadAccounts()) Accounts.Add(a);
+            }
+            catch (Exception ex) { try { Log.Error("LoadAccounts", ex); } catch { } }
 
-            CurrentAccount = Accounts.FirstOrDefault(a => a.Id == Settings.ActiveAccountId) ?? Accounts.FirstOrDefault();
-            if (CurrentAccount != null) Settings.ActiveAccountId = CurrentAccount.Id;
+            try
+            {
+                CurrentAccount = Accounts.FirstOrDefault(a => a.Id == Settings.ActiveAccountId) ?? Accounts.FirstOrDefault();
+                if (CurrentAccount != null) Settings.ActiveAccountId = CurrentAccount.Id;
+            }
+            catch (Exception ex) { try { Log.Error("Set CurrentAccount", ex); } catch { } }
 
             if (Accounts.Count == 0)
             {
@@ -298,22 +307,27 @@ namespace Sobre.ViewModels
                 ConnectionState = "Offline";
             }
 
-            _clock.Tick += (_, _) =>
+            try
             {
-                ClockText = DateTime.Now.ToString("h:mm tt");
-                DateText = DateTime.Now.ToString("dddd, d MMMM");
-            };
-            _clock.Start();
+                _clock.Tick += (_, _) =>
+                {
+                    ClockText = DateTime.Now.ToString("h:mm tt");
+                    DateText = DateTime.Now.ToString("dddd, d MMMM");
+                };
+                _clock.Start();
 
-            _syncTimer.Interval = TimeSpan.FromMinutes(Math.Max(1, Settings.SyncIntervalMinutes));
-            _syncTimer.Tick += async (_, _) => await SyncAsync(silent: true);
-            _syncTimer.Start();
+                _syncTimer.Interval = TimeSpan.FromMinutes(Math.Max(1, Settings.SyncIntervalMinutes));
+                _syncTimer.Tick += async (_, _) => await SyncAsync(silent: true);
+                _syncTimer.Start();
+            }
+            catch (Exception ex) { try { Log.Error("Timers", ex); } catch { } }
 
             // Ask for the password before anything is shown.
             if (Settings.LockEnabled && !string.IsNullOrEmpty(Settings.LockHash))
                 _isLocked = true;
 
-            SystemEvents_PowerModeChanged();
+            try { SystemEvents_PowerModeChanged(); } catch (Exception ex) { try { Log.Error("SystemEvents", ex); } catch { } }
+            try { Log.Info($"ShellViewModel ready Accounts={Accounts.Count} Locked={_isLocked}"); } catch { }
         }
 
         private void SystemEvents_PowerModeChanged()
@@ -613,6 +627,11 @@ namespace Sobre.ViewModels
             var password = GetPassword(CurrentAccount);
             if (string.IsNullOrEmpty(password)) return;
             await MailService.SetFlagsAsync(CurrentAccount, password, new[] { summary.Id }, read: true, remoteFolder: RemoteFolderFor(summary.Folder));
+        }
+
+        private bool HasValidCredentials(AccountRecord account)
+        {
+            return !string.IsNullOrWhiteSpace(GetPassword(account));
         }
 
         // ---------------- password cache ----------------

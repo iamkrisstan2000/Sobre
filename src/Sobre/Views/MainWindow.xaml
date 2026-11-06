@@ -549,7 +549,7 @@
                                 <FlowDocumentScrollViewer x:Name="ReaderViewer"
                                                           Margin="2,0,0,0"
                                                           VerticalScrollBarVisibility="Auto"
-                                                          HorizontalScrollBarVisibility="Disabled"
+                                                          HorizontalScrollBarVisibility="Auto"
                                                           IsToolBarVisible="False"
                                                           IsSelectionEnabled="True"
                                                           Background="Transparent"
